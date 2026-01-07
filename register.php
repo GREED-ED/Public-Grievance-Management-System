@@ -1,3 +1,53 @@
+<?php
+session_start();
+require_once 'db_connect.php';
+
+$error_msg = '';
+$success_msg = '';
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $first_name = trim($_POST['first_name']);
+    $last_name = trim($_POST['last_name']);
+    $mobile = trim($_POST['mobile']);
+    $email = trim($_POST['email']);
+    $nid = trim($_POST['nid']);
+    $password = $_POST['password'];
+    $confirm_password = $_POST['confirm_password'];
+    $terms = isset($_POST['terms']);
+
+    if (!$terms) {
+        $error_msg = "You must agree to the Terms of Service.";
+    } elseif ($password !== $confirm_password) {
+        $error_msg = "Passwords do not match.";
+    } else {
+        // Check if mobile already exists
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE mobile = ?");
+        $stmt->execute([$mobile]);
+        
+        if ($stmt->rowCount() > 0) {
+            $error_msg = "Mobile number already registered.";
+        } else {
+            // Insert User
+            $full_name = $first_name . ' ' . $last_name;
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+            $sql = "INSERT INTO users (full_name, email, mobile, password, nid_number, role) VALUES (?, ?, ?, ?, ?, 'citizen')";
+            $stmt = $pdo->prepare($sql);
+            
+            try {
+                if ($stmt->execute([$full_name, $email, $mobile, $hashed_password, $nid])) {
+                    header("Location: login.php?registered=1");
+                    exit();
+                } else {
+                    $error_msg = "Something went wrong. Please try again.";
+                }
+            } catch (PDOException $e) {
+                $error_msg = "Database Error: " . $e->getMessage();
+            }
+        }
+    }
+}
+?>
 <!DOCTYPE html>
 <html class="light" lang="en">
 <head>
@@ -44,16 +94,23 @@
                     <p class="text-gray-500 mt-2">Join the digital governance platform<br><span class="text-sm">(नयाँ खाता सिर्जना गर्नुहोस्)</span></p>
                 </div>
 
-                <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-5">
+                <?php if($error_msg): ?>
+                    <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                        <p class="text-red-700 font-bold">Error</p>
+                        <p class="text-red-600 text-sm"><?php echo htmlspecialchars($error_msg); ?></p>
+                    </div>
+                <?php endif; ?>
+
+                <form action="register.php" method="POST" class="space-y-5">
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">First Name <span class="text-red-500">*</span></label>
-                            <input type="text" required class="block w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary h-11 sm:text-sm" placeholder="Ram">
+                            <input type="text" name="first_name" required class="block w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary h-11 sm:text-sm" placeholder="Ram">
                         </div>
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Last Name <span class="text-red-500">*</span></label>
-                            <input type="text" required class="block w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary h-11 sm:text-sm" placeholder="Bahadur">
+                            <input type="text" name="last_name" required class="block w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary h-11 sm:text-sm" placeholder="Bahadur">
                         </div>
                     </div>
 
@@ -61,31 +118,31 @@
                         <label class="block text-sm font-bold text-gray-700 mb-1">Mobile Number <span class="text-red-500">*</span></label>
                         <div class="flex rounded-lg shadow-sm">
                             <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm font-bold">+977</span>
-                            <input type="tel" required class="flex-1 min-w-0 block w-full px-3 py-2 rounded-r-lg border-gray-300 focus:ring-primary focus:border-primary sm:text-sm h-11" placeholder="98XXXXXXXX">
+                            <input type="tel" name="mobile" required class="flex-1 min-w-0 block w-full px-3 py-2 rounded-r-lg border-gray-300 focus:ring-primary focus:border-primary sm:text-sm h-11" placeholder="98XXXXXXXX">
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Email Address</label>
-                        <input type="email" class="block w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary h-11 sm:text-sm" placeholder="example@email.com">
+                        <input type="email" name="email" class="block w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary h-11 sm:text-sm" placeholder="example@email.com">
                     </div>
 
                     <div class="p-4 bg-blue-50 rounded-lg border border-blue-100">
                         <label class="block text-sm font-bold text-secondary mb-1 flex items-center gap-2">
                             <span class="material-symbols-outlined text-lg">badge</span> Citizenship / NID Number
                         </label>
-                        <input type="text" required class="block w-full rounded-md border-gray-300 focus:ring-secondary focus:border-secondary h-11 sm:text-sm bg-white" placeholder="XX-XX-XX-XXXXX">
+                        <input type="text" name="nid" required class="block w-full rounded-md border-gray-300 focus:ring-secondary focus:border-secondary h-11 sm:text-sm bg-white" placeholder="XX-XX-XX-XXXXX">
                         <p class="text-xs text-gray-500 mt-1">Required for identity verification (नागरिकता नं)</p>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Password <span class="text-red-500">*</span></label>
-                            <input id="reg-pass" type="password" required class="block w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary h-11 sm:text-sm" placeholder="••••••••">
+                            <input name="password" type="password" required class="block w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary h-11 sm:text-sm" placeholder="••••••••">
                         </div>
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Confirm Password <span class="text-red-500">*</span></label>
-                            <input id="reg-confirm-pass" type="password" required class="block w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary h-11 sm:text-sm" placeholder="••••••••">
+                            <input name="confirm_password" type="password" required class="block w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary h-11 sm:text-sm" placeholder="••••••••">
                         </div>
                     </div>
 
@@ -98,14 +155,14 @@
                         </div>
                     </div>
 
-                    <button id="regBtn" type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-white bg-secondary hover:bg-blue-800 transition-all shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary">
+                    <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-white bg-secondary hover:bg-blue-800 transition-all shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary">
                         Create Account (खाता खोल्नुहोस्)
                     </button>
                 </form>
 
                 <p class="mt-4 text-center text-sm text-gray-600">
                     Already have an account? 
-                    <a href="login.html" class="font-bold text-primary hover:text-red-700">Sign in here</a>
+                    <a href="login.php" class="font-bold text-primary hover:text-red-700">Sign in here</a>
                 </p>
             </div>
         </div>
@@ -154,40 +211,5 @@
         
     </div>
 
-    <script>
-        function handleRegister(event) {
-            event.preventDefault();
-            
-            const btn = document.getElementById('regBtn');
-            const pass = document.getElementById('reg-pass').value;
-            const confirm = document.getElementById('reg-confirm-pass').value;
-            const originalText = btn.innerHTML;
-
-            // 1. Password Match Validation
-            if (pass !== confirm) {
-                alert("Passwords do not match!");
-                document.getElementById('reg-confirm-pass').classList.add('border-red-500');
-                return;
-            } else {
-                document.getElementById('reg-confirm-pass').classList.remove('border-red-500');
-            }
-
-            // 2. Loading State
-            btn.disabled = true;
-            btn.classList.add('opacity-80', 'cursor-wait');
-            btn.innerHTML = `<span class="material-symbols-outlined animate-spin mr-2 text-lg">progress_activity</span> Creating Account...`;
-
-            // 3. Simulate API Call
-            setTimeout(() => {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-                
-                // Success
-                if(confirm("Registration Successful! Please login to continue.")) {
-                    window.location.href = 'login.html';
-                }
-            }, 2000);
-        }
-    </script>
 </body>
 </html>

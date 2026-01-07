@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html class="light" lang="en">
 <head>
@@ -62,7 +65,13 @@
                 <a class="text-gray-700 font-medium hover:text-primary" href="#">Check Status</a>
                 <a class="text-gray-700 font-medium hover:text-primary" href="#">Contact</a>
                 <hr class="my-2">
-                <button class="w-full py-2 bg-primary text-white rounded-lg font-bold">Login</button>
+                <?php if(isset($_SESSION['user_id'])): ?>
+                    <a class="w-full py-2 block text-center bg-secondary text-white rounded-lg font-bold" href="<?php echo $_SESSION['role'] === 'admin' ? 'admin-dashboard.php' : 'user-dashboard.php'; ?>">Dashboard</a>
+                    <a class="w-full py-2 block text-center bg-red-100 text-red-700 rounded-lg font-bold mt-2" href="logout.php">Logout</a>
+                <?php else: ?>
+                    <button class="w-full py-2 bg-primary text-white rounded-lg font-bold" onclick="window.location.href='login.php'">Login</button>
+                    <button class="w-full py-2 bg-gray-100 text-gray-800 rounded-lg font-bold mt-2" onclick="window.location.href='register.php'">Register</button>
+                <?php endif; ?>
             </nav>
         </div>
     </div>
@@ -121,17 +130,27 @@
                 <div class="hidden lg:flex flex-1 justify-end gap-8 items-center">
                     <div class="flex items-center gap-6">
                         <a class="text-[#111418] text-sm font-medium hover:text-primary transition-colors" href="#">Home</a>
-                        <a class="text-[#111418] text-sm font-medium hover:text-primary transition-colors" href="#">About</a>
-                        <a class="text-[#111418] text-sm font-medium hover:text-primary transition-colors" href="#">Departments</a>
-                        <a class="text-[#111418] text-sm font-medium hover:text-primary transition-colors" href="#">Contact</a>
+                        <a class="text-[#111418] text-sm font-medium hover:text-primary transition-colors" href="about.php">About</a>
+                        <a class="text-[#111418] text-sm font-medium hover:text-primary transition-colors" href="departments.php">Departments</a>
+                        <a class="text-[#111418] text-sm font-medium hover:text-primary transition-colors" href="contact.php">Contact</a>
                     </div>
                     <div class="flex gap-2">
-                        <button class="flex items-center justify-center rounded-lg h-9 px-4 bg-primary text-white text-sm font-bold hover:bg-red-700 transition-colors shadow-sm">
-                            Login
-                        </button>
-                        <button class="flex items-center justify-center rounded-lg h-9 px-4 bg-[#f0f2f4] text-[#111418] text-sm font-bold hover:bg-gray-200 transition-colors">
-                            Register
-                        </button>
+                        <?php if(isset($_SESSION['user_id'])): ?>
+                            <span class="hidden md:flex items-center text-sm font-bold text-gray-700 mr-2">Namaste, <?php echo htmlspecialchars($_SESSION['user_name']); ?></span>
+                            <button class="flex items-center justify-center rounded-lg h-9 px-4 bg-secondary text-white text-sm font-bold hover:bg-blue-800 transition-colors shadow-sm gap-2" onclick="window.location.href='<?php echo $_SESSION['role'] === 'admin' ? 'admin-dashboard.php' : 'user-dashboard.php'; ?>'">
+                                <span class="material-symbols-outlined text-lg">dashboard</span> Dashboard
+                            </button>
+                            <button class="flex items-center justify-center rounded-lg h-9 px-4 bg-red-50 text-red-600 text-sm font-bold hover:bg-red-100 transition-colors border border-red-100" onclick="window.location.href='logout.php'">
+                                Logout
+                            </button>
+                        <?php else: ?>
+                            <button class="flex items-center justify-center rounded-lg h-9 px-4 bg-primary text-white text-sm font-bold hover:bg-red-700 transition-colors shadow-sm" onclick="window.location.href='login.php'">
+                                Login
+                            </button>
+                            <button class="flex items-center justify-center rounded-lg h-9 px-4 bg-[#f0f2f4] text-[#111418] text-sm font-bold hover:bg-gray-200 transition-colors" onclick="window.location.href='register.php'">
+                                Register
+                            </button>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <button class="lg:hidden p-2 text-gray-600 hover:bg-gray-100 rounded" onclick="toggleMenu()">
@@ -222,7 +241,7 @@
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div onclick="toggleModal('complaint-modal')" class="group flex flex-col gap-4 p-6 rounded-xl border border-[#dbe0e6] bg-white hover:border-primary hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer">
-                            <a href="form.html" class="group flex flex-col gap-4 p-6 rounded-xl border border-[#dbe0e6] bg-white hover:border-primary hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer">
+                            <a href="form.php" class="group flex flex-col gap-4 p-6 rounded-xl border border-[#dbe0e6] bg-white hover:border-primary hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer">
                                 <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
                                     <span class="material-symbols-outlined text-2xl">edit_document</span>
                                 </div>
@@ -234,30 +253,34 @@
                             </a>
                         </div>
                         
-                        <div onclick="document.getElementById('trackInput').focus()" class="group flex flex-col gap-4 p-6 rounded-xl border border-[#dbe0e6] bg-white hover:border-primary hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer">
-                            <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
-                                <span class="material-symbols-outlined text-2xl">search</span>
-                            </div>
-                            <div class="flex flex-col gap-1">
-                                <h3 class="text-[#111418] text-lg font-bold">Check Status</h3>
-                                <p class="text-[#111418] text-sm font-medium text-opacity-80">अवस्था हेर्नुहोस्</p>
-                                <p class="text-[#617589] text-sm mt-2">Track the live progress of your submitted grievance using your ID.</p>
-                            </div>
+                        <div class="group flex flex-col gap-4 p-6 rounded-xl border border-[#dbe0e6] bg-white hover:border-primary hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer">
+                            <a href="user-dashboard.php" class="group flex flex-col gap-4 p-6 rounded-xl border border-[#dbe0e6] bg-white hover:border-primary hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer">
+                                <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                                    <span class="material-symbols-outlined text-2xl">search</span>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <h3 class="text-[#111418] text-lg font-bold">Check Status</h3>
+                                    <p class="text-[#111418] text-sm font-medium text-opacity-80">अवस्था हेर्नुहोस्</p>
+                                    <p class="text-[#617589] text-sm mt-2">Track the live progress of your submitted grievance using your ID.</p>
+                                </div>
+                            </a>
                         </div>
 
                         <div class="group flex flex-col gap-4 p-6 rounded-xl border border-[#dbe0e6] bg-white hover:border-primary hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer">
-                            <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
-                                <span class="material-symbols-outlined text-2xl">menu_book</span>
-                            </div>
-                            <div class="flex flex-col gap-1">
-                                <h3 class="text-[#111418] text-lg font-bold">Department Directory</h3>
-                                <p class="text-[#111418] text-sm font-medium text-opacity-80">विभाग निर्देशिका</p>
-                                <p class="text-[#617589] text-sm mt-2">Find contact details and locations of relevant government departments.</p>
-                            </div>
+                            <a href="departments.php" class="group flex flex-col gap-4 p-6 rounded-xl border border-[#dbe0e6] bg-white hover:border-primary hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer">
+                                <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                                    <span class="material-symbols-outlined text-2xl">menu_book</span>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <h3 class="text-[#111418] text-lg font-bold">Department Directory</h3>
+                                    <p class="text-[#111418] text-sm font-medium text-opacity-80">विभाग निर्देशिका</p>
+                                    <p class="text-[#617589] text-sm mt-2">Find contact details and locations of relevant government departments.</p>
+                                </div>
+                            </a>
                         </div>
 
                         <div class="group flex flex-col gap-4 p-6 rounded-xl border border-[#dbe0e6] bg-white hover:border-primary hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer">
-                            <a href="faq.html" class="group flex flex-col gap-4 p-6 rounded-xl border border-[#dbe0e6] bg-white hover:border-primary hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer">
+                            <a href="faq.php" class="group flex flex-col gap-4 p-6 rounded-xl border border-[#dbe0e6] bg-white hover:border-primary hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer">
                                 <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
                                     <span class="material-symbols-outlined text-2xl">help</span>
                                 </div>
@@ -280,8 +303,8 @@
                         <div class="p-4 border-b border-[#f0f2f4] hover:bg-[#f8fafc] transition-colors cursor-pointer group">
                             <div class="flex gap-3">
                                 <div class="flex flex-col items-center justify-center bg-[#f0f2f4] rounded p-2 min-w-[50px] h-fit group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                                    <span class="text-xs font-bold uppercase">Oct</span>
-                                    <span class="text-lg font-bold">24</span>
+                                    <span class="text-xs font-bold uppercase">Jan</span>
+                                    <span class="text-lg font-bold">05</span>
                                 </div>
                                 <div class="flex flex-col gap-1">
                                     <h4 class="text-[#111418] text-sm font-bold line-clamp-2">System Maintenance Scheduled</h4>
@@ -292,8 +315,8 @@
                         <div class="p-4 border-b border-[#f0f2f4] hover:bg-[#f8fafc] transition-colors cursor-pointer group">
                             <div class="flex gap-3">
                                 <div class="flex flex-col items-center justify-center bg-[#f0f2f4] rounded p-2 min-w-[50px] h-fit group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                                    <span class="text-xs font-bold uppercase">Oct</span>
-                                    <span class="text-lg font-bold">15</span>
+                                    <span class="text-xs font-bold uppercase">Dec</span>
+                                    <span class="text-lg font-bold">28</span>
                                 </div>
                                 <div class="flex flex-col gap-1">
                                     <h4 class="text-[#111418] text-sm font-bold line-clamp-2">New Road Repair Reporting Feature</h4>
@@ -301,9 +324,7 @@
                                 </div>
                             </div>
                         </div>
-                        <a class="p-3 text-center text-sm font-bold text-primary hover:bg-[#f0f2f4] transition-colors" href="#">
-                            View All Notices
-                        </a>
+
                     </div>
                     
                     <div class="rounded-xl bg-primary text-white p-6 relative overflow-hidden shadow-lg hover:scale-105 transition-transform cursor-pointer">
@@ -336,8 +357,9 @@
                 <div class="flex flex-wrap gap-10 md:gap-20">
                     <div class="flex flex-col gap-3">
                         <h4 class="text-[#111418] text-sm font-bold uppercase tracking-wider">Quick Links</h4>
-                        <a class="text-[#617589] text-sm hover:text-primary" href="#">Home</a>
-                        <a class="text-[#617589] text-sm hover:text-primary" href="#">Submit Grievance</a>
+                        <a class="text-[#617589] text-sm hover:text-primary" href="index.php">Home</a>
+                        <a class="text-[#617589] text-sm hover:text-primary" href="form.php">Submit Grievance</a>
+                        <a class="text-[#617589] text-sm hover:text-primary" href="faq.php">FAQ</a>
                     </div>
                     <div class="flex flex-col gap-3">
                         <h4 class="text-[#111418] text-sm font-bold uppercase tracking-wider">Contact</h4>
@@ -373,7 +395,7 @@
             }
         }
 
-        // 2. Modal Logic
+        // 2. Modal Logicxx
         function toggleModal(modalID) {
             const modal = document.getElementById(modalID);
             modal.classList.toggle('active');

@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html class="light" lang="en">
 <head>
@@ -50,23 +53,41 @@
 </head>
 <body class="bg-background-light font-display text-[#111418] min-h-screen flex flex-col">
 
-    <header class="bg-surface border-b border-[#e5e7eb] sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                <a href="index.html" class="flex items-center gap-4 group">
-                    <div class="size-10 flex items-center justify-center rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors">
-                        <span class="material-symbols-outlined">account_balance</span>
-                    </div>
-                    <div class="flex flex-col">
-                        <h1 class="text-lg md:text-xl font-bold text-[#111418] leading-tight group-hover:text-primary transition-colors">Nepal Government</h1>
-                        <span class="text-xs md:text-sm font-medium text-gray-500">Public Grievance Management System</span>
-                    </div>
-                </a>
-                <div class="flex items-center gap-4">
-                    <a href="index.html" class="text-sm font-bold text-gray-500 hover:text-primary flex items-center gap-1">
-                        <span class="material-symbols-outlined text-lg">arrow_back</span>
-                        Back to Home
-                    </a>
+    <header class="bg-white border-b border-[#f0f2f4] sticky top-0 z-30">
+        <div class="px-4 md:px-10 py-3 flex items-center justify-between max-w-[1200px] mx-auto w-full">
+            <a href="index.php" class="flex items-center gap-4 cursor-pointer">
+                <div class="size-10 flex items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <span class="material-symbols-outlined">account_balance</span>
+                </div>
+                <div>
+                    <h2 class="text-[#111418] text-lg font-bold leading-tight">Nepal Government</h2>
+                    <p class="text-xs text-[#617589] font-medium">Public Grievance Management System</p>
+                </div>
+            </a>
+            <div class="hidden lg:flex flex-1 justify-end gap-8 items-center">
+                <div class="flex items-center gap-6">
+                    <a class="text-[#111418] text-sm font-medium hover:text-primary transition-colors" href="index.php">Home</a>
+                    <a class="text-[#111418] text-sm font-medium hover:text-primary transition-colors" href="about.php">About</a>
+                    <a class="text-[#111418] text-sm font-medium hover:text-primary transition-colors" href="departments.php">Departments</a>
+                    <a class="text-[#111418] text-sm font-medium hover:text-primary transition-colors" href="contact.php">Contact</a>
+                </div>
+                <div class="flex gap-2">
+                    <?php if(isset($_SESSION['user_id'])): ?>
+                        <span class="hidden md:flex items-center text-sm font-bold text-gray-700 mr-2">Namaste, <?php echo htmlspecialchars($_SESSION['user_name']); ?></span>
+                        <button class="flex items-center justify-center rounded-lg h-9 px-4 bg-secondary text-white text-sm font-bold hover:bg-blue-800 transition-colors shadow-sm gap-2" onclick="window.location.href='<?php echo $_SESSION['role'] === 'admin' ? 'admin-dashboard.php' : 'user-dashboard.php'; ?>'">
+                            <span class="material-symbols-outlined text-lg">dashboard</span> Dashboard
+                        </button>
+                        <button class="flex items-center justify-center rounded-lg h-9 px-4 bg-red-50 text-red-600 text-sm font-bold hover:bg-red-100 transition-colors border border-red-100" onclick="window.location.href='logout.php'">
+                            Logout
+                        </button>
+                    <?php else: ?>
+                        <button class="flex items-center justify-center rounded-lg h-9 px-4 bg-primary text-white text-sm font-bold hover:bg-red-700 transition-colors shadow-sm" onclick="window.location.href='login.php'">
+                            Login
+                        </button>
+                        <button class="flex items-center justify-center rounded-lg h-9 px-4 bg-[#f0f2f4] text-[#111418] text-sm font-bold hover:bg-gray-200 transition-colors" onclick="window.location.href='register.php'">
+                            Register
+                        </button>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -238,8 +259,33 @@
 
     </main>
 
-    <footer class="bg-white border-t border-[#dbe0e6] py-8 text-center">
-        <p class="text-sm text-gray-500">© 2024 Government of Nepal. All rights reserved.</p>
+    <footer class="bg-white border-t border-[#dbe0e6] py-10">
+        <div class="max-w-[1200px] mx-auto px-4 md:px-10 flex flex-col md:flex-row justify-between gap-10">
+            <div class="flex flex-col gap-4 max-w-sm">
+                <div class="flex items-center gap-3">
+                    <div class="size-8 flex items-center justify-center rounded bg-primary/10 text-primary">
+                        <span class="material-symbols-outlined">account_balance</span>
+                    </div>
+                    <span class="text-[#111418] font-bold text-lg">Nepal Government</span>
+                </div>
+                <p class="text-[#617589] text-sm">Official Portal for Public Grievance Management.</p>
+                <p class="text-[#617589] text-sm">© 2024 Government of Nepal. All rights reserved.</p>
+            </div>
+            <div class="flex flex-wrap gap-10 md:gap-20">
+                <div class="flex flex-col gap-3">
+                    <h4 class="text-[#111418] text-sm font-bold uppercase tracking-wider">Quick Links</h4>
+                    <a class="text-[#617589] text-sm hover:text-primary" href="index.php">Home</a>
+                    <a class="text-[#617589] text-sm hover:text-primary" href="about.php">About</a>
+                    <a class="text-[#617589] text-sm hover:text-primary" href="faq.php">FAQ</a>
+                </div>
+                <div class="flex flex-col gap-3">
+                    <h4 class="text-[#111418] text-sm font-bold uppercase tracking-wider">Contact</h4>
+                    <p class="text-[#617589] text-sm flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm">location_on</span> Kathmandu, Nepal
+                    </p>
+                </div>
+            </div>
+        </div>
     </footer>
 
     <script>

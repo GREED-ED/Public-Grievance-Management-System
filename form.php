@@ -1,3 +1,66 @@
+<?php
+session_start();
+require_once 'db_connect.php';
+
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+$error = '';
+$success = '';
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $user_id = $_SESSION['user_id'];
+    $category = $_POST['category'];
+    $description = $_POST['description'];
+    $province = $_POST['province'];
+    $district = $_POST['district'];
+    $municipality = $_POST['municipality'];
+    
+    // File Upload Logic
+    $attachment = null;
+    if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] == 0) {
+        $upload_dir = 'uploads/';
+        if (!is_dir($upload_dir)) {
+            mkdir($upload_dir, 0777, true);
+        }
+        
+        $file_name = time() . '_' . basename($_FILES['attachment']['name']);
+        $target_file = $upload_dir . $file_name;
+        
+        // Simple check for image/pdf
+        $ext = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+        if (in_array($ext, ['jpg', 'jpeg', 'png', 'pdf'])) {
+            if (move_uploaded_file($_FILES['attachment']['tmp_name'], $target_file)) {
+                $attachment = $file_name;
+            } else {
+                $error = "Failed to upload file.";
+            }
+        } else {
+            $error = "Only JPG, PNG, and PDF files are allowed.";
+        }
+    }
+
+    if (empty($error)) {
+        // Generate Reference ID
+        $reference_id = 'GRV-' . date('Y') . '-' . rand(1000, 9999);
+        
+        $sql = "INSERT INTO grievances (user_id, category, description, location_province, location_district, location_municipality, attachment, reference_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $pdo->prepare($sql);
+        
+        try {
+            $stmt->execute([$user_id, $category, $description, $province, $district, $municipality, $attachment, $reference_id]);
+            // Redirect to dashboard with success
+            header("Location: user-dashboard.php?submitted=1&ref=" . $reference_id);
+            exit();
+        } catch (PDOException $e) {
+            $error = "Database Error: " . $e->getMessage();
+        }
+    }
+}
+?>
 <!DOCTYPE html>
 <html class="light" lang="en">
 <head>
@@ -13,7 +76,6 @@
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script>
         tailwind.config = {
-            darkMode: "class",
             theme: {
                 extend: {
                     colors: {
@@ -29,30 +91,35 @@
             },
         }
     </script>
-    <style>
-        body { font-family: "Public Sans", "Noto Sans", sans-serif; }
-    </style>
 </head>
 <body class="bg-background-light text-[#111418] min-h-screen flex flex-col">
 
-<header class="bg-surface border-b border-[#e5e7eb] sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-20">
-            <a href="index.html" class="flex items-center gap-4 group">
-                <div class="size-10 flex items-center justify-center rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors">
-                    <span class="material-symbols-outlined">account_balance</span>
-                </div>
-                <div class="flex flex-col">
-                    <h1 class="text-lg md:text-xl font-bold text-[#111418] leading-tight group-hover:text-primary transition-colors">Nepal Government</h1>
-                    <span class="text-xs md:text-sm font-medium text-gray-500">Public Grievance Management System</span>
-                </div>
-            </a>
-            
-            <div class="flex items-center gap-4">
-                <a href="index.html" class="text-sm font-bold text-gray-500 hover:text-primary flex items-center gap-1">
-                    <span class="material-symbols-outlined text-lg">home</span>
-                    <span class="hidden sm:inline">Home</span>
-                </a>
+<header class="bg-white border-b border-[#f0f2f4] sticky top-0 z-30">
+    <div class="px-4 md:px-10 py-3 flex items-center justify-between max-w-[1200px] mx-auto w-full">
+        <a href="index.php" class="flex items-center gap-4 cursor-pointer">
+            <div class="size-10 flex items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <span class="material-symbols-outlined">account_balance</span>
+            </div>
+            <div>
+                <h2 class="text-[#111418] text-lg font-bold leading-tight">Nepal Government</h2>
+                <p class="text-xs text-[#617589] font-medium">Public Grievance Management System</p>
+            </div>
+        </a>
+        <div class="hidden lg:flex flex-1 justify-end gap-8 items-center">
+            <div class="flex items-center gap-6">
+                <a class="text-[#111418] text-sm font-medium hover:text-primary transition-colors" href="index.php">Home</a>
+                <a class="text-[#111418] text-sm font-medium hover:text-primary transition-colors" href="about.php">About</a>
+                <a class="text-[#111418] text-sm font-medium hover:text-primary transition-colors" href="departments.php">Departments</a>
+                <a class="text-[#111418] text-sm font-medium hover:text-primary transition-colors" href="contact.php">Contact</a>
+            </div>
+            <div class="flex gap-2">
+                <span class="hidden md:flex items-center text-sm font-bold text-gray-700 mr-2">Namaste, <?php echo htmlspecialchars($_SESSION['user_name']); ?></span>
+                <button class="flex items-center justify-center rounded-lg h-9 px-4 bg-secondary text-white text-sm font-bold hover:bg-blue-800 transition-colors shadow-sm gap-2" onclick="window.location.href='<?php echo (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') ? 'admin-dashboard.php' : 'user-dashboard.php'; ?>'">
+                    <span class="material-symbols-outlined text-lg">dashboard</span> Dashboard
+                </button>
+                <button class="flex items-center justify-center rounded-lg h-9 px-4 bg-red-50 text-red-600 text-sm font-bold hover:bg-red-100 transition-colors border border-red-100" onclick="window.location.href='logout.php'">
+                    Logout
+                </button>
             </div>
         </div>
     </div>
@@ -62,11 +129,18 @@
     <div class="max-w-4xl mx-auto">
         
         <div class="mb-6">
-            <a href="index.html" class="inline-flex items-center gap-1 text-sm font-medium text-gray-500 hover:text-primary transition-colors">
+            <a href="user-dashboard.php" class="inline-flex items-center gap-1 text-sm font-medium text-gray-500 hover:text-primary transition-colors">
                 <span class="material-symbols-outlined text-lg">arrow_back</span>
                 Back to Dashboard
             </a>
         </div>
+
+        <?php if ($error): ?>
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+                <p class="text-red-700 font-bold">Error</p>
+                <p class="text-red-600 text-sm"><?php echo htmlspecialchars($error); ?></p>
+            </div>
+        <?php endif; ?>
 
         <div class="bg-surface rounded-xl shadow-lg border-t-4 border-primary overflow-hidden">
             
@@ -85,45 +159,17 @@
                 <p class="mt-2 text-gray-600 text-sm">Please fill out the form below. Fields marked with <span class="text-red-500">*</span> are mandatory.</p>
             </div>
 
-            <form id="grievanceForm" class="p-6 md:p-8 space-y-10">
+            <form action="form.php" method="POST" enctype="multipart/form-data" class="p-6 md:p-8 space-y-10">
                 
                 <section>
                     <div class="flex items-center gap-2 mb-6 pb-2 border-b border-gray-200">
                         <span class="material-symbols-outlined text-primary">person</span>
                         <h3 class="text-lg font-bold text-[#111418]">
-                            Citizen Details <span class="text-sm font-normal text-gray-500 ml-1">(नागरिक विवरण)</span>
+                            Reporting User <span class="text-sm font-normal text-gray-500 ml-1">(विवरण)</span>
                         </h3>
                     </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="col-span-2 md:col-span-1">
-                            <label class="block mb-1.5">
-                                <span class="block text-sm font-bold text-gray-800">Full Name <span class="text-red-500">*</span></span>
-                                <input required class="w-full h-11 px-3 rounded-lg border-gray-300 focus:border-secondary focus:ring-secondary shadow-sm text-sm transition-all" placeholder="Ram Bahadur" type="text"/>
-                                <span class="text-xs text-gray-400 mt-1">पूरा नाम</span>
-                            </label>
-                        </div>
-
-                        <div>
-                            <label class="block mb-1.5">
-                                <span class="block text-sm font-bold text-gray-800">Mobile Number <span class="text-red-500">*</span></span>
-                                <div class="flex rounded-lg shadow-sm">
-                                    <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm font-bold">
-                                        +977
-                                    </span>
-                                    <input required class="flex-1 min-w-0 block w-full px-3 py-2.5 rounded-r-lg border-gray-300 focus:border-secondary focus:ring-secondary sm:text-sm" placeholder="98XXXXXXXX" type="tel"/>
-                                </div>
-                                <span class="text-xs text-gray-400 mt-1">मोबाइल नं</span>
-                            </label>
-                        </div>
-
-                        <div class="col-span-2 md:col-span-1">
-                            <label class="block mb-1.5">
-                                <span class="block text-sm font-bold text-gray-800">Email Address</span>
-                                <input class="w-full h-11 px-3 rounded-lg border-gray-300 focus:border-secondary focus:ring-secondary shadow-sm text-sm" placeholder="example@gmail.com" type="email"/>
-                                <span class="text-xs text-gray-400 mt-1">इमेल ठेगाना (ऐच्छिक)</span>
-                            </label>
-                        </div>
+                    <div>
+                         <p class="text-gray-700">Logged in as: <span class="font-bold"><?php echo htmlspecialchars($_SESSION['user_name']); ?></span></p>
                     </div>
                 </section>
 
@@ -139,7 +185,7 @@
                         <div>
                             <label class="block mb-1.5">
                                 <span class="block text-sm font-bold text-gray-800">Province</span>
-                                <select class="w-full h-11 px-3 rounded-lg border-gray-300 focus:border-secondary focus:ring-secondary shadow-sm text-sm bg-white">
+                                <select name="province" class="w-full h-11 px-3 rounded-lg border-gray-300 focus:border-secondary focus:ring-secondary shadow-sm text-sm bg-white">
                                     <option>Bagmati Province</option>
                                     <option>Gandaki Province</option>
                                     <option>Lumbini Province</option>
@@ -151,7 +197,7 @@
                         <div>
                             <label class="block mb-1.5">
                                 <span class="block text-sm font-bold text-gray-800">District</span>
-                                <select class="w-full h-11 px-3 rounded-lg border-gray-300 focus:border-secondary focus:ring-secondary shadow-sm text-sm bg-white">
+                                <select name="district" class="w-full h-11 px-3 rounded-lg border-gray-300 focus:border-secondary focus:ring-secondary shadow-sm text-sm bg-white">
                                     <option>Kathmandu</option>
                                     <option>Lalitpur</option>
                                     <option>Bhaktapur</option>
@@ -163,7 +209,7 @@
                         <div>
                             <label class="block mb-1.5">
                                 <span class="block text-sm font-bold text-gray-800">Municipality</span>
-                                <select class="w-full h-11 px-3 rounded-lg border-gray-300 focus:border-secondary focus:ring-secondary shadow-sm text-sm bg-white">
+                                <select name="municipality" class="w-full h-11 px-3 rounded-lg border-gray-300 focus:border-secondary focus:ring-secondary shadow-sm text-sm bg-white">
                                     <option>Kathmandu Metro</option>
                                     <option>Lalitpur Metro</option>
                                     <option>Kirtipur</option>
@@ -186,7 +232,7 @@
                         <div class="max-w-md">
                             <label class="block mb-1.5">
                                 <span class="block text-sm font-bold text-gray-800">Category <span class="text-red-500">*</span></span>
-                                <select class="w-full h-11 px-3 rounded-lg border-gray-300 focus:border-secondary focus:ring-secondary shadow-sm text-sm bg-white">
+                                <select name="category" class="w-full h-11 px-3 rounded-lg border-gray-300 focus:border-secondary focus:ring-secondary shadow-sm text-sm bg-white">
                                     <option>Road Maintenance (सडक मर्मत)</option>
                                     <option>Water Supply (खानेपानी)</option>
                                     <option>Electricity (बिद्युत)</option>
@@ -200,7 +246,7 @@
                         <div>
                             <label class="block mb-1.5">
                                 <span class="block text-sm font-bold text-gray-800">Description <span class="text-red-500">*</span></span>
-                                <textarea required class="w-full p-4 rounded-lg border-gray-300 focus:border-secondary focus:ring-secondary shadow-sm text-sm resize-y min-h-[150px]" placeholder="Please describe your grievance in detail so we can help you better..."></textarea>
+                                <textarea name="description" required class="w-full p-4 rounded-lg border-gray-300 focus:border-secondary focus:ring-secondary shadow-sm text-sm resize-y min-h-[150px]" placeholder="Please describe your grievance in detail so we can help you better..."></textarea>
                                 <span class="text-xs text-gray-400 mt-1">गुनासोको विस्तृत विवरण</span>
                             </label>
                         </div>
@@ -213,7 +259,7 @@
                                     <div class="flex text-sm text-gray-600 justify-center">
                                         <label class="relative cursor-pointer rounded-md font-bold text-secondary hover:text-blue-700 focus-within:outline-none" for="file-upload">
                                             <span>Upload a file</span>
-                                            <input class="sr-only" id="file-upload" name="file-upload" type="file"/>
+                                            <input class="sr-only" id="file-upload" name="attachment" type="file"/>
                                         </label>
                                         <p class="pl-1">or drag and drop</p>
                                     </div>
@@ -225,73 +271,18 @@
                 </section>
 
                 <div class="pt-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row justify-end gap-3">
-                    <a href="index.html" class="w-full sm:w-auto px-6 py-3 border border-gray-300 shadow-sm text-sm font-bold rounded-lg text-gray-700 bg-white hover:bg-gray-50 text-center transition-colors">
+                    <a href="user-dashboard.php" class="w-full sm:w-auto px-6 py-3 border border-gray-300 shadow-sm text-sm font-bold rounded-lg text-gray-700 bg-white hover:bg-gray-50 text-center transition-colors">
                         Cancel (रद्द गर्नुहोस्)
                     </a>
-                    <button id="submitBtn" onclick="handleSubmit(event)" class="w-full sm:w-auto px-8 py-3 border border-transparent text-sm font-bold rounded-lg text-white bg-primary hover:bg-red-700 shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                    <button type="submit" class="w-full sm:w-auto px-8 py-3 border border-transparent text-sm font-bold rounded-lg text-white bg-primary hover:bg-red-700 shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
                         <span class="material-symbols-outlined">send</span>
                         Submit Grievance
                     </button>
                 </div>
             </form>
         </div>
-
-        <div class="mt-8 text-center pb-8">
-            <p class="text-sm text-gray-500">
-                © 2024 Government of Nepal. Public Grievance Management System.
-            </p>
-            <div class="flex justify-center gap-4 mt-2 text-xs text-gray-400">
-                <a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
-                <span>•</span>
-                <a class="hover:text-primary transition-colors" href="#">Support: 1111</a>
-            </div>
-        </div>
     </div>
 </main>
-
-<script>
-    function handleSubmit(e) {
-        e.preventDefault(); // Stop actual form submission
-        
-        const btn = document.getElementById('submitBtn');
-        const originalContent = btn.innerHTML;
-
-        // 1. Check if form is valid (Simple check)
-        const inputs = document.querySelectorAll('input[required], textarea[required]');
-        let isValid = true;
-        inputs.forEach(input => {
-            if(!input.value) {
-                isValid = false;
-                input.classList.add('border-red-500');
-            } else {
-                input.classList.remove('border-red-500');
-            }
-        });
-
-        if(!isValid) {
-            alert("Please fill in all required fields (marked with *).");
-            return;
-        }
-
-        // 2. Loading State
-        btn.disabled = true;
-        btn.classList.add('opacity-75', 'cursor-not-allowed');
-        btn.innerHTML = `<span class="material-symbols-outlined animate-spin">refresh</span> Processing...`;
-
-        // 3. Success Simulation
-        setTimeout(() => {
-            // Reset button
-            btn.innerHTML = originalContent;
-            btn.classList.remove('opacity-75', 'cursor-not-allowed');
-            btn.disabled = false;
-
-            // Show success message
-            if(confirm("Success! Your grievance has been registered.\nReference ID: GRV-2024-8822\n\nClick OK to return to Home.")) {
-                window.location.href = "index.html";
-            }
-        }, 1500);
-    }
-</script>
 
 </body>
 </html>

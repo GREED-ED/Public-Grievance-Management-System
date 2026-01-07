@@ -1,3 +1,41 @@
+<?php
+session_start();
+require_once 'db_connect.php';
+
+$error = '';
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $mobile = trim($_POST['mobile']);
+    $password = $_POST['password'];
+
+    if (empty($mobile) || empty($password)) {
+        $error = "Please enter both mobile/email and password.";
+    } else {
+        // Allow login by Email OR Mobile
+        $sql = "SELECT * FROM users WHERE mobile = ? OR email = ?";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$mobile, $mobile]);
+        $user = $stmt->fetch();
+
+        if ($user && password_verify($password, $user['password'])) {
+            // Password correct
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_name'] = $user['full_name'];
+            $_SESSION['role'] = $user['role'];
+
+            // Redirect based on role
+            if ($user['role'] === 'admin') {
+                header("Location: admin-dashboard.php");
+            } else {
+                header("Location: user-dashboard.php");
+            }
+            exit();
+        } else {
+            $error = "Invalid credential provider.";
+        }
+    }
+}
+?>
 <!DOCTYPE html>
 <html class="light" lang="en">
 <head>
@@ -47,15 +85,29 @@
                     <p class="text-gray-500 mt-2">Sign in to track your grievances<br><span class="text-sm">(तपाइँको खातामा लगइन गर्नुहोस्)</span></p>
                 </div>
 
-                <form id="loginForm" onsubmit="handleLogin(event)" class="mt-8 space-y-6">
+                <?php if (isset($_GET['registered'])): ?>
+                    <div class="bg-green-50 border-l-4 border-green-500 p-4">
+                        <p class="text-green-700 font-bold">Success</p>
+                        <p class="text-green-600 text-sm">Account created successfully! Please login.</p>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($error): ?>
+                    <div class="bg-red-50 border-l-4 border-red-500 p-4">
+                        <p class="text-red-700 font-bold">Error</p>
+                        <p class="text-red-600 text-sm"><?php echo htmlspecialchars($error); ?></p>
+                    </div>
+                <?php endif; ?>
+
+                <form action="login.php" method="POST" class="mt-8 space-y-6">
                     
                     <div>
-                        <label for="email" class="block text-sm font-bold text-gray-700 mb-1">Mobile Number or Email</label>
+                        <label for="mobile" class="block text-sm font-bold text-gray-700 mb-1">Mobile Number or Email</label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <span class="material-symbols-outlined text-gray-400">person</span>
                             </div>
-                            <input id="email" name="email" type="text" required class="pl-10 block w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary sm:text-sm h-12" placeholder="98XXXXXXXX">
+                            <input id="mobile" name="mobile" type="text" required class="pl-10 block w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary sm:text-sm h-12" placeholder="98XXXXXXXX">
                         </div>
                     </div>
 
@@ -82,29 +134,17 @@
                         </div>
                     </div>
 
-                    <button id="loginBtn" type="submit" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-white bg-primary hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all shadow-lg hover:shadow-xl">
+                    <button type="submit" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-white bg-primary hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all shadow-lg hover:shadow-xl">
                         Sign in (लगइन)
                     </button>
                     
-                    <div class="relative my-6">
-                        <div class="absolute inset-0 flex items-center">
-                            <div class="w-full border-t border-gray-300"></div>
-                        </div>
-                        <div class="relative flex justify-center text-sm">
-                            <span class="px-2 bg-white text-gray-500 font-medium">Or continue with</span>
-                        </div>
-                    </div>
 
-                    <button type="button" class="w-full flex justify-center items-center gap-3 py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors">
-                        <!-- <img src="https://play-lh.googleusercontent.com/s6W5n1n5hWfWvjF9GZlO5g_bKqVf3Lg_h_Xh_Xh_Xh_Xh_Xh_Xh_Xh" class="w-6 h-6 rounded bg-blue-600" > -->
-                        Login via Nagarik App
-                    </button>
 
                 </form>
 
                 <p class="mt-8 text-center text-sm text-gray-600">
                     Don't have an account? 
-                    <a href="register.html" class="font-bold text-primary hover:text-red-700">Register New Account</a>
+                    <a href="register.php" class="font-bold text-primary hover:text-red-700">Register New Account</a>
                 </p>
             </div>
         </div>
@@ -145,7 +185,6 @@
     </div>
 
     <script>
-        // 1. Password Visibility Toggle
         function togglePassword() {
             const passwordInput = document.getElementById('password');
             const eyeIcon = document.getElementById('eyeIcon');
@@ -157,35 +196,6 @@
                 passwordInput.type = 'password';
                 eyeIcon.innerText = 'visibility';
             }
-        }
-
-        // 2. Login Handler
-        function handleLogin(event) {
-            event.preventDefault();
-            const btn = document.getElementById('loginBtn');
-            const email = document.getElementById('email').value;
-            const originalText = btn.innerHTML;
-
-            // Simple Validation
-            if(!email) {
-                alert("Please enter your Mobile Number or Email.");
-                return;
-            }
-
-            // Loading State
-            btn.disabled = true;
-            btn.classList.add('opacity-80', 'cursor-wait');
-            btn.innerHTML = `<span class="material-symbols-outlined animate-spin mr-2 text-lg">progress_activity</span> Authenticating...`;
-
-            // Simulate API Call
-            setTimeout(() => {
-                // Determine destination (Admin vs User simulation)
-                if(email.includes('admin')) {
-                    window.location.href = 'admin-dashboard.html';
-                } else {
-                    window.location.href = 'user-dashboard.html';
-                }
-            }, 1500);
         }
     </script>
 </body>
