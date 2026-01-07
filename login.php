@@ -75,8 +75,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <div class="w-full max-w-md space-y-8">
                 <div class="text-center">
-                    <div class="mx-auto size-14 bg-primary/10 rounded-xl flex items-center justify-center text-primary mb-4">
-                        <span class="material-symbols-outlined text-3xl">account_balance</span>
+                    <div class="mx-auto size-16 flex items-center justify-center mb-4">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Emblem_of_Nepal.svg/1024px-Emblem_of_Nepal.svg.png" alt="Nepal Emblem" class="h-full w-auto">
                     </div>
                     <h2 class="text-3xl font-black text-[#111418]"><?php echo __('welcome_back'); ?></h2>
                     <p class="text-gray-500 mt-2"><?php echo __('sign_in_to_track'); ?></p>
@@ -149,7 +149,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="hidden lg:block relative bg-gray-900">
             <img class="absolute inset-0 h-full w-full object-cover opacity-60 mix-blend-overlay" 
                  src="https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=2671&auto=format&fit=crop" 
-                 alt="Nepal Government Building">
+                 alt="<?php echo __('nepal_government'); ?> Building">
             
             <div class="absolute inset-0 bg-gradient-to-br from-secondary/90 to-primary/80 mix-blend-multiply"></div>
             

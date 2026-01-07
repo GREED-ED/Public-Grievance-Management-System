@@ -90,6 +90,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <div class="w-full max-w-lg space-y-6 mt-10 lg:mt-0">
                 <div class="text-center mb-8">
+                    <div class="mx-auto size-16 flex items-center justify-center mb-4">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Emblem_of_Nepal.svg/1024px-Emblem_of_Nepal.svg.png" alt="Nepal Emblem" class="h-full w-auto">
+                    </div>
                     <h2 class="text-3xl font-black text-[#111418]"><?php echo __('create_account'); ?></h2>
                     <p class="text-gray-500 mt-2"><?php echo __('join_platform'); ?></p>
                 </div>

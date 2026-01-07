@@ -22,11 +22,14 @@ function getLangLink($lang_code) {
 <header class="bg-white border-b border-[#f0f2f4] sticky top-0 z-30">
     <div class="px-4 md:px-10 py-3 flex items-center justify-between max-w-[1200px] mx-auto w-full">
         <a href="index.php?lang=<?php echo $_SESSION['lang']; ?>" class="flex items-center gap-4 cursor-pointer">
-            <div class="size-10 flex items-center justify-center rounded-lg bg-primary/10 text-primary">
-                <span class="material-symbols-outlined">account_balance</span>
+            <div class="size-12 flex items-center justify-center rounded-lg overflow-hidden">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Emblem_of_Nepal.svg/1024px-Emblem_of_Nepal.svg.png" alt="Nepal Emblem" class="h-full w-auto">
             </div>
-            <div>
-                <h2 class="text-[#111418] text-lg font-bold leading-tight"><?php echo __('nepal_government'); ?></h2>
+            <div class="flex flex-col">
+                <div class="flex items-center gap-2">
+                    <h2 class="text-[#111418] text-lg font-bold leading-tight"><?php echo __('nepal_government'); ?></h2>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/9/9b/Flag_of_Nepal.svg" alt="Nepal Flag" class="h-4 w-auto shadow-sm">
+                </div>
                 <p class="text-xs text-[#617589] font-medium"><?php echo __('system_name'); ?></p>
             </div>
         </a>

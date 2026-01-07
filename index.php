@@ -298,8 +298,8 @@ require_once 'includes/languages.php';
             <div class="max-w-[1200px] mx-auto px-4 md:px-10 flex flex-col md:flex-row justify-between gap-10">
                 <div class="flex flex-col gap-4 max-w-sm">
                     <div class="flex items-center gap-3">
-                        <div class="size-8 flex items-center justify-center rounded bg-primary/10 text-primary">
-                            <span class="material-symbols-outlined">account_balance</span>
+                        <div class="size-10 flex items-center justify-center rounded overflow-hidden">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Emblem_of_Nepal.svg/1024px-Emblem_of_Nepal.svg.png" alt="Nepal Emblem" class="h-full w-auto">
                         </div>
                         <span class="text-[#111418] font-bold text-lg"><?php echo __('nepal_government'); ?></span>
                     </div>
