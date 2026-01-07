@@ -1,58 +1,88 @@
-# Public Grievance Management System
+# Public Grievance Management System (PGMS)
 
-A web-based platform for citizens to submit and track grievances with the Nepal Government.
+A modern, web-based platform designed for citizens of Nepal to submit, track, and manage grievances with government departments. This system aims to improve transparency, accountability, and citizen engagement in governance.
+
+---
+
+## 🌟 Key Features
+
+- **🌍 Full Multilingual Support**: Seamlessly switch between **English** and **Nepali** across the entire application.
+- **🔐 Secure Authentication**: Citizen registration and login system with persistent language preferences.
+- **📝 Grievance Submission**: Easy-to-use form for reporting issues, including category selection, location details, and file attachments (images/PDFs).
+- **📊 Citizen Dashboard**: Personal dashboard for users to track the real-time status of their submitted grievances.
+- **🛠 Admin Management**: Specialized dashboard for administrators to review grievances, update status (Pending, In Progress, Resolved, Rejected), and manage records.
+- **📱 Responsive Design**: Built with a "mobile-first" approach using Tailwind CSS, ensuring a premium experience on all devices.
+- **🔔 Real-time Feedback**: Interactive elements and localized alerts for a better user experience.
+
+---
 
 ## 🛠 Tech Stack
-- **Frontend**: HTML, Tailwind CSS (via CDN)
-- **Backend**: PHP
-- **Database**: MySQL
 
-## 🚀 How to Run
+- **Frontend**: HTML5, Vanilla CSS, Tailwind CSS (via CDN)
+- **Icons**: Google Material Symbols
+- **Typography**: Public Sans, Noto Sans (for Nepali support)
+- **Backend**: PHP 8.x
+- **Database**: MySQL / MariaDB
+
+---
+
+## 📂 Project Structure
+
+```text
+├── includes/           # Reusable components (Navbar, Language Logic)
+├── lang/               # Translation files (en.php, np.php)
+├── uploads/            # Directory for user-submitted attachments
+├── admin-dashboard.php # Administrator portal
+├── user-dashboard.php  # Citizen portal
+├── form.php            # Grievance submission form
+├── db_connect.php      # PDO database connection
+├── database.sql        # Database schema and initial data
+└── ... (other pages)
+```
+
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
-You need a local server environment with **PHP** and **MySQL**.
-- **Mac**: MAMP, XAMPP, or Homebrew (PHP + MySQL).
-- **Windows**: XAMPP or WAMP.
-- **Linux**: LAMP stack.
+- A local server environment (MAMP, XAMPP, WAMP, or Local PHP/MySQL).
+- PHP 7.4 or higher recommended.
+- MySQL 5.7 or higher.
 
 ### Step 1: Database Setup
 1. Start your MySQL Server.
-2. Create a new database named `grievance_db`.
-3. Import the `database.sql` file provided in this project into that database.
-   - You can use tools like **phpMyAdmin**, **MySQL Workbench**, or the command line:
-     ```bash
-     mysql -u root -p grievance_db < database.sql
-     ```
-
-### Step 2: Configure Connection
-1. Open `db_connect.php`.
-2. Update the credentials to match your local MySQL configuration:
-   ```php
-   $host = 'localhost';
-   $dbname = 'grievance_db';
-   $username = 'root'; // Change if different
-   $password = '';     // Change if different (MAMP users often use 'root')
-   ```
-
-### Step 3: Start the Server
-You can use PHP's built-in server for testing.
-1. Open your terminal/command prompt.
-2. Navigate to the project directory:
+2. Create a database named `grievance_db`.
+3. Import the `database.sql` file:
    ```bash
-   cd /path/to/Public-Grievance-Management-System
-   ```
-3. Run the following command:
-   ```bash
-   php -S localhost:8000
+   mysql -u root -p grievance_db < database.sql
    ```
 
-### Step 4: Usage
-1. Open your browser and go to: [http://localhost:8000](http://localhost:8000)
-2. **Register**: Create a new citizen account.
-3. **Login**: Log in to submit grievances.
-4. **Admin Access**:
-   - To access the admin dashboard, you need an account with the role `admin`.
-   - You can manually update a registered user's role in the database:
-     ```sql
-     UPDATE users SET role = 'admin' WHERE email = 'your@email.com';
-     ```
+### Step 2: Configuration
+Update your database credentials in `db_connect.php`:
+```php
+$host = 'localhost';
+$dbname = 'grievance_db';
+$username = 'root';
+$password = ''; // Set your password (often 'root' on MAMP)
+```
+
+### Step 3: Launch
+Navigate to the project directory and start the local server:
+```bash
+php -S localhost:8000
+```
+Visit `http://localhost:8000` in your browser.
+
+---
+
+## 👤 Admin Access
+To access the admin dashboard:
+1. Register a normal account via the UI.
+2. Manually change the `role` in the `users` table to `admin`:
+   ```sql
+   UPDATE users SET role = 'admin' WHERE email = 'your@email.com';
+   ```
+
+---
+© 2024 Government of Nepal. All rights reserved.
+
