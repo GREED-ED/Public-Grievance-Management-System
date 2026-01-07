@@ -1,12 +1,12 @@
 <?php
-session_start();
+require_once 'includes/languages.php';
 ?>
 <!DOCTYPE html>
 <html class="light" lang="en">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Departments - Public Grievance Management System</title>
+    <title><?php echo __('departments_page_title'); ?> - <?php echo __('system_name'); ?></title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;700;900&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet"/>
@@ -32,51 +32,13 @@ session_start();
 </head>
 <body class="bg-background-light text-[#111418] font-display overflow-x-hidden flex flex-col min-h-screen">
     
-    <header class="bg-white border-b border-[#f0f2f4] sticky top-0 z-30">
-        <div class="px-4 md:px-10 py-3 flex items-center justify-between max-w-[1200px] mx-auto w-full">
-            <a href="index.php" class="flex items-center gap-4 cursor-pointer">
-                <div class="size-10 flex items-center justify-center rounded-lg bg-primary/10 text-primary">
-                    <span class="material-symbols-outlined">account_balance</span>
-                </div>
-                <div>
-                    <h2 class="text-[#111418] text-lg font-bold leading-tight">Nepal Government</h2>
-                    <p class="text-xs text-[#617589] font-medium">Public Grievance Management System</p>
-                </div>
-            </a>
-            <div class="hidden lg:flex flex-1 justify-end gap-8 items-center">
-                <div class="flex items-center gap-6">
-                    <a class="text-[#111418] text-sm font-medium hover:text-primary transition-colors" href="index.php">Home</a>
-                    <a class="text-[#111418] text-sm font-medium hover:text-primary transition-colors" href="about.php">About</a>
-                    <a class="text-primary text-sm font-bold transition-colors" href="departments.php">Departments</a>
-                    <a class="text-[#111418] text-sm font-medium hover:text-primary transition-colors" href="contact.php">Contact</a>
-                </div>
-                <div class="flex gap-2">
-                    <?php if(isset($_SESSION['user_id'])): ?>
-                        <span class="hidden md:flex items-center text-sm font-bold text-gray-700 mr-2">Namaste, <?php echo htmlspecialchars($_SESSION['user_name']); ?></span>
-                        <button class="flex items-center justify-center rounded-lg h-9 px-4 bg-secondary text-white text-sm font-bold hover:bg-blue-800 transition-colors shadow-sm gap-2" onclick="window.location.href='<?php echo $_SESSION['role'] === 'admin' ? 'admin-dashboard.php' : 'user-dashboard.php'; ?>'">
-                            <span class="material-symbols-outlined text-lg">dashboard</span> Dashboard
-                        </button>
-                        <button class="flex items-center justify-center rounded-lg h-9 px-4 bg-red-50 text-red-600 text-sm font-bold hover:bg-red-100 transition-colors border border-red-100" onclick="window.location.href='logout.php'">
-                            Logout
-                        </button>
-                    <?php else: ?>
-                        <button class="flex items-center justify-center rounded-lg h-9 px-4 bg-primary text-white text-sm font-bold hover:bg-red-700 transition-colors shadow-sm" onclick="window.location.href='login.php'">
-                            Login
-                        </button>
-                        <button class="flex items-center justify-center rounded-lg h-9 px-4 bg-[#f0f2f4] text-[#111418] text-sm font-bold hover:bg-gray-200 transition-colors" onclick="window.location.href='register.php'">
-                            Register
-                        </button>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
-    </header>
+    <?php include 'includes/navbar.php'; ?>
 
     <main class="flex-grow w-full max-w-[1200px] mx-auto px-4 md:px-10 py-10">
         
         <div class="mb-10 text-center">
-             <h1 class="text-3xl md:text-4xl font-black text-[#111418] mb-4">Government Departments</h1>
-             <p class="text-gray-600 max-w-2xl mx-auto">Find contact information and key responsibilities of various government departments handling public grievances.</p>
+             <h1 class="text-3xl md:text-4xl font-black text-[#111418] mb-4"><?php echo __('departments_page_title'); ?></h1>
+             <p class="text-gray-600 max-w-2xl mx-auto"><?php echo __('departments_intro'); ?></p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -88,8 +50,8 @@ session_start();
                          <span class="material-symbols-outlined text-2xl">add_road</span>
                     </div>
                 </div>
-                <h3 class="text-lg font-bold text-[#111418] mb-2 group-hover:text-primary transition-colors">Department of Roads</h3>
-                <p class="text-gray-500 text-sm mb-4">Responsible for construction, maintenance, and expansion of strategic road networks.</p>
+                <h3 class="text-lg font-bold text-[#111418] mb-2 group-hover:text-primary transition-colors"><?php echo __('dept_roads'); ?></h3>
+                <p class="text-gray-500 text-sm mb-4"><?php echo __('dept_roads_desc'); ?></p>
                 <div class="text-xs text-gray-400 font-mono bg-gray-50 p-2 rounded">
                     Phone: 01-5529075<br>
                     Email: info@dor.gov.np
@@ -103,8 +65,8 @@ session_start();
                          <span class="material-symbols-outlined text-2xl">water_drop</span>
                     </div>
                 </div>
-                <h3 class="text-lg font-bold text-[#111418] mb-2 group-hover:text-primary transition-colors">Water Supply Department</h3>
-                <p class="text-gray-500 text-sm mb-4">Planning and implementation of water supply and sanitation projects nationwide.</p>
+                <h3 class="text-lg font-bold text-[#111418] mb-2 group-hover:text-primary transition-colors"><?php echo __('dept_water'); ?></h3>
+                <p class="text-gray-500 text-sm mb-4"><?php echo __('dept_water_desc'); ?></p>
                  <div class="text-xs text-gray-400 font-mono bg-gray-50 p-2 rounded">
                     Phone: 01-4413744<br>
                     Email: info@dwssm.gov.np
@@ -118,8 +80,8 @@ session_start();
                          <span class="material-symbols-outlined text-2xl">bolt</span>
                     </div>
                 </div>
-                <h3 class="text-lg font-bold text-[#111418] mb-2 group-hover:text-primary transition-colors">Nepal Electricity Authority</h3>
-                <p class="text-gray-500 text-sm mb-4">Generation, transmission, and distribution of adequate, reliable, and affordable power.</p>
+                <h3 class="text-lg font-bold text-[#111418] mb-2 group-hover:text-primary transition-colors"><?php echo __('dept_electricity'); ?></h3>
+                <p class="text-gray-500 text-sm mb-4"><?php echo __('dept_electricity_desc'); ?></p>
                  <div class="text-xs text-gray-400 font-mono bg-gray-50 p-2 rounded">
                     Phone: 1151 (Hotline)<br>
                     Email: info@nea.org.np
@@ -133,8 +95,8 @@ session_start();
                          <span class="material-symbols-outlined text-2xl">recycling</span>
                     </div>
                 </div>
-                <h3 class="text-lg font-bold text-[#111418] mb-2 group-hover:text-primary transition-colors">Waste Management Division</h3>
-                <p class="text-gray-500 text-sm mb-4">Overseeing municipal waste collection, processing, and environmental safety.</p>
+                <h3 class="text-lg font-bold text-[#111418] mb-2 group-hover:text-primary transition-colors"><?php echo __('dept_waste'); ?></h3>
+                <p class="text-gray-500 text-sm mb-4"><?php echo __('dept_waste_desc'); ?></p>
                  <div class="text-xs text-gray-400 font-mono bg-gray-50 p-2 rounded">
                     Phone: 01-4231610<br>
                     Email: env@kathmandu.gov.np
@@ -148,8 +110,8 @@ session_start();
                          <span class="material-symbols-outlined text-2xl">gavel</span>
                     </div>
                 </div>
-                <h3 class="text-lg font-bold text-[#111418] mb-2 group-hover:text-primary transition-colors">CIAA</h3>
-                <p class="text-gray-500 text-sm mb-4">Commission for the Investigation of Abuse of Authority. Handling corruption cases.</p>
+                <h3 class="text-lg font-bold text-[#111418] mb-2 group-hover:text-primary transition-colors"><?php echo __('dept_ciaa'); ?></h3>
+                <p class="text-gray-500 text-sm mb-4"><?php echo __('dept_ciaa_desc'); ?></p>
                  <div class="text-xs text-gray-400 font-mono bg-gray-50 p-2 rounded">
                     Phone: 107 (Hotline)<br>
                     Email: ciaa@ciaa.gov.np
@@ -163,8 +125,8 @@ session_start();
                          <span class="material-symbols-outlined text-2xl">support_agent</span>
                     </div>
                 </div>
-                <h3 class="text-lg font-bold text-[#111418] mb-2 group-hover:text-primary transition-colors">Hello Sarkar</h3>
-                <p class="text-gray-500 text-sm mb-4">A direct channel to the Prime Minister's Office for immediate grievance hearing.</p>
+                <h3 class="text-lg font-bold text-[#111418] mb-2 group-hover:text-primary transition-colors"><?php echo __('dept_hello_sarkar'); ?></h3>
+                <p class="text-gray-500 text-sm mb-4"><?php echo __('dept_hello_sarkar_desc'); ?></p>
                  <div class="text-xs text-gray-400 font-mono bg-gray-50 p-2 rounded">
                     Phone: 1111<br>
                     Email: 1111@opmcm.gov.np
@@ -182,22 +144,26 @@ session_start();
                     <div class="size-8 flex items-center justify-center rounded bg-primary/10 text-primary">
                         <span class="material-symbols-outlined">account_balance</span>
                     </div>
-                    <span class="text-[#111418] font-bold text-lg">Nepal Government</span>
+                    <span class="text-[#111418] font-bold text-lg"><?php echo __('nepal_government'); ?></span>
                 </div>
-                <p class="text-[#617589] text-sm">Official Portal for Public Grievance Management.</p>
-                <p class="text-[#617589] text-sm">© 2024 Government of Nepal. All rights reserved.</p>
+                <p class="text-[#617589] text-sm"><?php echo __('official_portal'); ?></p>
+                <p class="text-[#617589] text-sm">© 2024 <?php echo __('rights_reserved'); ?></p>
             </div>
             <div class="flex flex-wrap gap-10 md:gap-20">
                 <div class="flex flex-col gap-3">
-                    <h4 class="text-[#111418] text-sm font-bold uppercase tracking-wider">Quick Links</h4>
-                    <a class="text-[#617589] text-sm hover:text-primary" href="index.php">Home</a>
-                    <a class="text-[#617589] text-sm hover:text-primary" href="about.php">About</a>
-                    <a class="text-[#617589] text-sm hover:text-primary" href="departments.php">Departments</a>
+                    <h4 class="text-[#111418] text-sm font-bold uppercase tracking-wider"><?php echo __('quick_links'); ?></h4>
+                    <a class="text-[#617589] text-sm hover:text-primary" href="index.php?lang=<?php echo $_SESSION['lang']; ?>"><?php echo __('home'); ?></a>
+                    <a class="text-[#617589] text-sm hover:text-primary" href="about.php?lang=<?php echo $_SESSION['lang']; ?>"><?php echo __('about'); ?></a>
+                    <a class="text-[#617589] text-sm hover:text-primary" href="departments.php?lang=<?php echo $_SESSION['lang']; ?>"><?php echo __('departments'); ?></a>
+                    <a class="text-[#617589] text-sm hover:text-primary" href="contact.php?lang=<?php echo $_SESSION['lang']; ?>"><?php echo __('contact'); ?></a>
                 </div>
                 <div class="flex flex-col gap-3">
-                    <h4 class="text-[#111418] text-sm font-bold uppercase tracking-wider">Contact</h4>
+                    <h4 class="text-[#111418] text-sm font-bold uppercase tracking-wider"><?php echo __('contact_us'); ?></h4>
                     <p class="text-[#617589] text-sm flex items-center gap-2">
                         <span class="material-symbols-outlined text-sm">location_on</span> Kathmandu, Nepal
+                    </p>
+                    <p class="text-[#617589] text-sm flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm">call</span> +977-1-4200000
                     </p>
                 </div>
             </div>

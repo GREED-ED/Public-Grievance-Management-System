@@ -1,12 +1,12 @@
 <?php
-session_start();
+require_once 'includes/languages.php';
 ?>
 <!DOCTYPE html>
 <html class="light" lang="en">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Public Grievance Management System - Nepal Government</title>
+    <title><?php echo __('system_name'); ?> - <?php echo __('nepal_government'); ?></title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;700;900&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet"/>
@@ -60,17 +60,17 @@ session_start();
                 </button>
             </div>
             <nav class="flex flex-col gap-4">
-                <a class="text-gray-700 font-medium hover:text-primary" href="#">Home</a>
-                <a class="text-gray-700 font-medium hover:text-primary" href="#">Services</a>
-                <a class="text-gray-700 font-medium hover:text-primary" href="#">Check Status</a>
-                <a class="text-gray-700 font-medium hover:text-primary" href="#">Contact</a>
+                <a class="text-gray-700 font-medium hover:text-primary" href="index.php?lang=<?php echo $_SESSION['lang']; ?>"><?php echo __('home'); ?></a>
+                <a class="text-gray-700 font-medium hover:text-primary" href="about.php?lang=<?php echo $_SESSION['lang']; ?>"><?php echo __('about'); ?></a>
+                <a class="text-gray-700 font-medium hover:text-primary" href="departments.php?lang=<?php echo $_SESSION['lang']; ?>"><?php echo __('departments'); ?></a>
+                <a class="text-gray-700 font-medium hover:text-primary" href="contact.php?lang=<?php echo $_SESSION['lang']; ?>"><?php echo __('contact'); ?></a>
                 <hr class="my-2">
                 <?php if(isset($_SESSION['user_id'])): ?>
-                    <a class="w-full py-2 block text-center bg-secondary text-white rounded-lg font-bold" href="<?php echo $_SESSION['role'] === 'admin' ? 'admin-dashboard.php' : 'user-dashboard.php'; ?>">Dashboard</a>
-                    <a class="w-full py-2 block text-center bg-red-100 text-red-700 rounded-lg font-bold mt-2" href="logout.php">Logout</a>
+                    <a class="w-full py-2 block text-center bg-secondary text-white rounded-lg font-bold" href="<?php echo $_SESSION['role'] === 'admin' ? 'admin-dashboard.php' : 'user-dashboard.php'; ?>"><?php echo __('dashboard'); ?></a>
+                    <a class="w-full py-2 block text-center bg-red-100 text-red-700 rounded-lg font-bold mt-2" href="logout.php"><?php echo __('logout'); ?></a>
                 <?php else: ?>
-                    <button class="w-full py-2 bg-primary text-white rounded-lg font-bold" onclick="window.location.href='login.php'">Login</button>
-                    <button class="w-full py-2 bg-gray-100 text-gray-800 rounded-lg font-bold mt-2" onclick="window.location.href='register.php'">Register</button>
+                    <button class="w-full py-2 bg-primary text-white rounded-lg font-bold" onclick="window.location.href='login.php'"><?php echo __('login'); ?></button>
+                    <button class="w-full py-2 bg-gray-100 text-gray-800 rounded-lg font-bold mt-2" onclick="window.location.href='register.php'"><?php echo __('register'); ?></button>
                 <?php endif; ?>
             </nav>
         </div>
@@ -79,23 +79,23 @@ session_start();
     <div id="complaint-modal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
         <div class="modal-content bg-white w-full max-w-lg rounded-xl shadow-2xl overflow-hidden">
             <div class="bg-primary px-6 py-4 flex justify-between items-center">
-                <h3 class="text-white font-bold text-lg">Submit New Grievance (गुनासो दर्ता)</h3>
+                <h3 class="text-white font-bold text-lg"><?php echo __('submit_grievance'); ?></h3>
                 <button onclick="toggleModal('complaint-modal')" class="text-white hover:bg-white/20 rounded-full p-1">
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
             <div class="p-6 flex flex-col gap-4">
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">Full Name</label>
+                    <label class="block text-sm font-bold text-gray-700 mb-1"><?php echo __('full_name'); ?></label>
                     <input type="text" class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary" placeholder="Ram Bahadur">
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Phone</label>
+                        <label class="block text-sm font-bold text-gray-700 mb-1"><?php echo __('phone'); ?></label>
                         <input type="text" class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary" placeholder="98XXXXXXXX">
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">District</label>
+                        <label class="block text-sm font-bold text-gray-700 mb-1"><?php echo __('district'); ?></label>
                         <select class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary">
                             <option>Kathmandu</option>
                             <option>Lalitpur</option>
@@ -105,59 +105,18 @@ session_start();
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">Complaint Description</label>
-                    <textarea class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary" rows="3" placeholder="Describe your issue..."></textarea>
+                    <label class="block text-sm font-bold text-gray-700 mb-1"><?php echo __('complaint_desc'); ?></label>
+                    <textarea class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary" rows="3" placeholder="<?php echo __('complaint_placeholder'); ?>"></textarea>
                 </div>
                 <button onclick="submitForm()" class="w-full bg-secondary text-white font-bold py-3 rounded-lg hover:bg-blue-800 transition-colors flex items-center justify-center gap-2">
-                    <span class="material-symbols-outlined">send</span> Submit Grievance
+                    <span class="material-symbols-outlined">send</span> <?php echo __('submit_btn'); ?>
                 </button>
             </div>
         </div>
     </div>
 
     <div class="relative flex min-h-screen w-full flex-col group/design-root">
-        <header class="bg-white border-b border-[#f0f2f4] sticky top-0 z-30">
-            <div class="px-4 md:px-10 py-3 flex items-center justify-between max-w-[1200px] mx-auto w-full">
-                <div class="flex items-center gap-4 cursor-pointer" onclick="window.location.reload()">
-                    <div class="size-10 flex items-center justify-center rounded-lg bg-primary/10 text-primary">
-                        <span class="material-symbols-outlined">account_balance</span>
-                    </div>
-                    <div>
-                        <h2 class="text-[#111418] text-lg font-bold leading-tight">Nepal Government</h2>
-                        <p class="text-xs text-[#617589] font-medium">Public Grievance Management System</p>
-                    </div>
-                </div>
-                <div class="hidden lg:flex flex-1 justify-end gap-8 items-center">
-                    <div class="flex items-center gap-6">
-                        <a class="text-[#111418] text-sm font-medium hover:text-primary transition-colors" href="#">Home</a>
-                        <a class="text-[#111418] text-sm font-medium hover:text-primary transition-colors" href="about.php">About</a>
-                        <a class="text-[#111418] text-sm font-medium hover:text-primary transition-colors" href="departments.php">Departments</a>
-                        <a class="text-[#111418] text-sm font-medium hover:text-primary transition-colors" href="contact.php">Contact</a>
-                    </div>
-                    <div class="flex gap-2">
-                        <?php if(isset($_SESSION['user_id'])): ?>
-                            <span class="hidden md:flex items-center text-sm font-bold text-gray-700 mr-2">Namaste, <?php echo htmlspecialchars($_SESSION['user_name']); ?></span>
-                            <button class="flex items-center justify-center rounded-lg h-9 px-4 bg-secondary text-white text-sm font-bold hover:bg-blue-800 transition-colors shadow-sm gap-2" onclick="window.location.href='<?php echo $_SESSION['role'] === 'admin' ? 'admin-dashboard.php' : 'user-dashboard.php'; ?>'">
-                                <span class="material-symbols-outlined text-lg">dashboard</span> Dashboard
-                            </button>
-                            <button class="flex items-center justify-center rounded-lg h-9 px-4 bg-red-50 text-red-600 text-sm font-bold hover:bg-red-100 transition-colors border border-red-100" onclick="window.location.href='logout.php'">
-                                Logout
-                            </button>
-                        <?php else: ?>
-                            <button class="flex items-center justify-center rounded-lg h-9 px-4 bg-primary text-white text-sm font-bold hover:bg-red-700 transition-colors shadow-sm" onclick="window.location.href='login.php'">
-                                Login
-                            </button>
-                            <button class="flex items-center justify-center rounded-lg h-9 px-4 bg-[#f0f2f4] text-[#111418] text-sm font-bold hover:bg-gray-200 transition-colors" onclick="window.location.href='register.php'">
-                                Register
-                            </button>
-                        <?php endif; ?>
-                    </div>
-                </div>
-                <button class="lg:hidden p-2 text-gray-600 hover:bg-gray-100 rounded" onclick="toggleMenu()">
-                    <span class="material-symbols-outlined">menu</span>
-                </button>
-            </div>
-        </header>
+        <?php include 'includes/navbar.php'; ?>
 
         <main class="flex-1 flex flex-col items-center w-full">
             <div class="w-full bg-white pb-8">
@@ -167,11 +126,11 @@ session_start();
                         
                         <div class="flex flex-col gap-3 max-w-3xl z-10">
                             <h1 class="text-white text-3xl md:text-5xl font-black leading-tight tracking-tight">
-                                Public Grievance Management System<br/>
-                                <span class="font-normal text-2xl md:text-3xl mt-2 block opacity-90">(जनगुनासो व्यवस्थापन प्रणाली)</span>
+                                <?php echo __('hero_title'); ?><br/>
+                                <span class="font-normal text-2xl md:text-3xl mt-2 block opacity-90"><?php echo __('hero_subtitle'); ?></span>
                             </h1>
                             <p class="text-white/90 text-sm md:text-lg font-medium max-w-2xl mx-auto">
-                                Ensuring transparency, accountability, and good governance. Submit your grievances or track their status seamlessly.
+                                <?php echo __('hero_desc'); ?>
                             </p>
                         </div>
                         
@@ -181,10 +140,10 @@ session_start();
                                     <div class="text-[#617589] flex items-center justify-center pl-4 pr-2 bg-white">
                                         <span class="material-symbols-outlined">search</span>
                                     </div>
-                                    <input id="trackInput" class="flex w-full flex-1 border-none bg-white h-full px-2 text-sm md:text-base font-normal text-[#111418] placeholder:text-[#617589] focus:ring-0" placeholder="Enter Complaint ID (e.g. GRV-2023-899)"/>
+                                    <input id="trackInput" class="flex w-full flex-1 border-none bg-white h-full px-2 text-sm md:text-base font-normal text-[#111418] placeholder:text-[#617589] focus:ring-0" placeholder="<?php echo __('track_placeholder'); ?>"/>
                                     <div class="flex items-center justify-center p-2 bg-white">
                                         <button onclick="handleTrack()" class="flex items-center justify-center rounded-lg h-full px-6 bg-primary text-white text-sm md:text-base font-bold hover:bg-red-700 transition-colors">
-                                            Track
+                                            <?php echo __('track_btn'); ?>
                                         </button>
                                     </div>
                                 </div>
@@ -198,36 +157,33 @@ session_start();
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 shadow-lg rounded-xl bg-white p-2 border border-[#e5e7eb]">
                     <div class="flex flex-col gap-1 p-6 rounded-lg bg-white border-b md:border-b-0 md:border-r border-[#f0f2f4]">
                         <div class="flex justify-between items-start">
-                            <p class="text-[#617589] text-sm font-medium uppercase tracking-wider">Total Grievances</p>
+                            <p class="text-[#617589] text-sm font-medium uppercase tracking-wider"><?php echo __('stats_total'); ?></p>
                             <span class="material-symbols-outlined text-primary">inbox</span>
                         </div>
                         <div class="flex items-baseline gap-2 mt-2">
                             <p class="counter text-[#111418] text-3xl font-bold" data-target="15420">0</p>
                             <span class="text-[#078838] text-sm font-medium bg-[#078838]/10 px-2 py-0.5 rounded">+12%</span>
                         </div>
-                        <p class="text-xs text-[#617589] font-normal">कुल गुनासो</p>
                     </div>
                     <div class="flex flex-col gap-1 p-6 rounded-lg bg-white border-b md:border-b-0 md:border-r border-[#f0f2f4]">
                         <div class="flex justify-between items-start">
-                            <p class="text-[#617589] text-sm font-medium uppercase tracking-wider">Resolved</p>
+                            <p class="text-[#617589] text-sm font-medium uppercase tracking-wider"><?php echo __('stats_resolved'); ?></p>
                             <span class="material-symbols-outlined text-[#078838]">check_circle</span>
                         </div>
                         <div class="flex items-baseline gap-2 mt-2">
                             <p class="counter text-[#111418] text-3xl font-bold" data-target="14100">0</p>
                             <span class="text-[#078838] text-sm font-medium bg-[#078838]/10 px-2 py-0.5 rounded">+5%</span>
                         </div>
-                        <p class="text-xs text-[#617589] font-normal">समाधान गरिएको</p>
                     </div>
                     <div class="flex flex-col gap-1 p-6 rounded-lg bg-white">
                         <div class="flex justify-between items-start">
-                            <p class="text-[#617589] text-sm font-medium uppercase tracking-wider">Pending</p>
+                            <p class="text-[#617589] text-sm font-medium uppercase tracking-wider"><?php echo __('stats_pending'); ?></p>
                             <span class="material-symbols-outlined text-[#e73908]">hourglass_empty</span>
                         </div>
                         <div class="flex items-baseline gap-2 mt-2">
                             <p class="counter text-[#111418] text-3xl font-bold" data-target="1320">0</p>
                             <span class="text-[#e73908] text-sm font-medium bg-[#e73908]/10 px-2 py-0.5 rounded">-2%</span>
                         </div>
-                        <p class="text-xs text-[#617589] font-normal">बाँकी</p>
                     </div>
                 </div>
             </div>
@@ -235,22 +191,21 @@ session_start();
             <div class="max-w-[1200px] w-full px-4 md:px-10 pb-16 flex flex-col lg:flex-row gap-8">
                 <div class="flex-1 flex flex-col gap-8">
                     <div class="flex flex-col gap-2">
-                        <h2 class="text-[#111418] text-2xl md:text-3xl font-bold leading-tight">Key Services</h2>
-                        <p class="text-[#617589] text-base">Select an option below to proceed with your grievance management.</p>
+                        <h2 class="text-[#111418] text-2xl md:text-3xl font-bold leading-tight"><?php echo __('key_services'); ?></h2>
+                        <p class="text-[#617589] text-base"><?php echo __('key_services_desc'); ?></p>
                     </div>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div onclick="toggleModal('complaint-modal')" class="group flex flex-col gap-4 p-6 rounded-xl border border-[#dbe0e6] bg-white hover:border-primary hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer">
-                            <a href="form.php" class="group flex flex-col gap-4 p-6 rounded-xl border border-[#dbe0e6] bg-white hover:border-primary hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer">
+                            <div class="group flex flex-col gap-4 p-6 rounded-xl border border-[#dbe0e6] bg-white hover:border-primary hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer">
                                 <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
                                     <span class="material-symbols-outlined text-2xl">edit_document</span>
                                 </div>
                                 <div class="flex flex-col gap-1">
-                                    <h3 class="text-[#111418] text-lg font-bold">Submit Complaint</h3>
-                                    <p class="text-[#111418] text-sm font-medium text-opacity-80">गुनासो दर्ता</p>
-                                    <p class="text-[#617589] text-sm mt-2">File a new grievance regarding public services quickly and easily.</p>
+                                    <h3 class="text-[#111418] text-lg font-bold"><?php echo __('file_grievance'); ?></h3>
+                                    <p class="text-[#617589] text-sm mt-2"><?php echo __('file_grievance_desc'); ?></p>
                                 </div>
-                            </a>
+                            </div>
                         </div>
                         
                         <div class="group flex flex-col gap-4 p-6 rounded-xl border border-[#dbe0e6] bg-white hover:border-primary hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer">
@@ -259,9 +214,8 @@ session_start();
                                     <span class="material-symbols-outlined text-2xl">search</span>
                                 </div>
                                 <div class="flex flex-col gap-1">
-                                    <h3 class="text-[#111418] text-lg font-bold">Check Status</h3>
-                                    <p class="text-[#111418] text-sm font-medium text-opacity-80">अवस्था हेर्नुहोस्</p>
-                                    <p class="text-[#617589] text-sm mt-2">Track the live progress of your submitted grievance using your ID.</p>
+                                    <h3 class="text-[#111418] text-lg font-bold"><?php echo __('track_status_title'); ?></h3>
+                                    <p class="text-[#617589] text-sm mt-2"><?php echo __('check_status_desc'); ?></p>
                                 </div>
                             </a>
                         </div>
@@ -272,9 +226,8 @@ session_start();
                                     <span class="material-symbols-outlined text-2xl">menu_book</span>
                                 </div>
                                 <div class="flex flex-col gap-1">
-                                    <h3 class="text-[#111418] text-lg font-bold">Department Directory</h3>
-                                    <p class="text-[#111418] text-sm font-medium text-opacity-80">विभाग निर्देशिका</p>
-                                    <p class="text-[#617589] text-sm mt-2">Find contact details and locations of relevant government departments.</p>
+                                    <h3 class="text-[#111418] text-lg font-bold"><?php echo __('dept_directory'); ?></h3>
+                                    <p class="text-[#617589] text-sm mt-2"><?php echo __('dept_directory_desc'); ?></p>
                                 </div>
                             </a>
                         </div>
@@ -285,9 +238,8 @@ session_start();
                                     <span class="material-symbols-outlined text-2xl">help</span>
                                 </div>
                                 <div class="flex flex-col gap-1">
-                                    <h3 class="text-[#111418] text-lg font-bold">FAQ & Guidelines</h3>
-                                    <p class="text-[#111418] text-sm font-medium text-opacity-80">प्रायः सोधिने प्रश्नहरू</p>
-                                    <p class="text-[#617589] text-sm mt-2">Understand the process, required documents, and policies.</p>
+                                    <h3 class="text-[#111418] text-lg font-bold"><?php echo __('faq_guidelines'); ?></h3>
+                                    <p class="text-[#617589] text-sm mt-2"><?php echo __('faq_desc'); ?></p>
                                 </div>
                             </a>
                         </div>
@@ -297,7 +249,7 @@ session_start();
                 <div class="w-full lg:w-[360px] flex flex-col gap-6">
                     <h3 class="text-[#111418] text-xl font-bold leading-tight flex items-center gap-2">
                         <span class="material-symbols-outlined text-primary">campaign</span>
-                        Recent Notices
+                        <?php echo __('recent_notices'); ?>
                     </h3>
                     <div class="bg-white rounded-xl border border-[#dbe0e6] overflow-hidden flex flex-col">
                         <div class="p-4 border-b border-[#f0f2f4] hover:bg-[#f8fafc] transition-colors cursor-pointer group">
@@ -307,8 +259,8 @@ session_start();
                                     <span class="text-lg font-bold">05</span>
                                 </div>
                                 <div class="flex flex-col gap-1">
-                                    <h4 class="text-[#111418] text-sm font-bold line-clamp-2">System Maintenance Scheduled</h4>
-                                    <p class="text-[#617589] text-xs line-clamp-2">The portal will be undergoing maintenance from 10 PM to 2 AM.</p>
+                                    <h4 class="text-[#111418] text-sm font-bold line-clamp-2"><?php echo __('notice_1_title'); ?></h4>
+                                    <p class="text-[#617589] text-xs line-clamp-2"><?php echo __('notice_1_desc'); ?></p>
                                 </div>
                             </div>
                         </div>
@@ -319,8 +271,8 @@ session_start();
                                     <span class="text-lg font-bold">28</span>
                                 </div>
                                 <div class="flex flex-col gap-1">
-                                    <h4 class="text-[#111418] text-sm font-bold line-clamp-2">New Road Repair Reporting Feature</h4>
-                                    <p class="text-[#617589] text-xs line-clamp-2">Citizens can now directly upload photos of damaged roads.</p>
+                                    <h4 class="text-[#111418] text-sm font-bold line-clamp-2"><?php echo __('notice_2_title'); ?></h4>
+                                    <p class="text-[#617589] text-xs line-clamp-2"><?php echo __('notice_2_desc'); ?></p>
                                 </div>
                             </div>
                         </div>
@@ -349,20 +301,20 @@ session_start();
                         <div class="size-8 flex items-center justify-center rounded bg-primary/10 text-primary">
                             <span class="material-symbols-outlined">account_balance</span>
                         </div>
-                        <span class="text-[#111418] font-bold text-lg">Nepal Government</span>
+                        <span class="text-[#111418] font-bold text-lg"><?php echo __('nepal_government'); ?></span>
                     </div>
-                    <p class="text-[#617589] text-sm">Official Portal for Public Grievance Management.</p>
-                    <p class="text-[#617589] text-sm">© 2024 Government of Nepal. All rights reserved.</p>
+                    <p class="text-[#617589] text-sm"><?php echo __('official_portal'); ?></p>
+                    <p class="text-[#617589] text-sm">© 2024 <?php echo __('rights_reserved'); ?></p>
                 </div>
                 <div class="flex flex-wrap gap-10 md:gap-20">
                     <div class="flex flex-col gap-3">
-                        <h4 class="text-[#111418] text-sm font-bold uppercase tracking-wider">Quick Links</h4>
-                        <a class="text-[#617589] text-sm hover:text-primary" href="index.php">Home</a>
-                        <a class="text-[#617589] text-sm hover:text-primary" href="form.php">Submit Grievance</a>
-                        <a class="text-[#617589] text-sm hover:text-primary" href="faq.php">FAQ</a>
+                        <h4 class="text-[#111418] text-sm font-bold uppercase tracking-wider"><?php echo __('quick_links'); ?></h4>
+                        <a class="text-[#617589] text-sm hover:text-primary" href="index.php?lang=<?php echo $_SESSION['lang']; ?>"><?php echo __('home'); ?></a>
+                        <a class="text-[#617589] text-sm hover:text-primary" href="form.php?lang=<?php echo $_SESSION['lang']; ?>"><?php echo __('submit_grievance'); ?></a>
+                        <a class="text-[#617589] text-sm hover:text-primary" href="faq.php?lang=<?php echo $_SESSION['lang']; ?>"><?php echo __('faq'); ?></a>
                     </div>
                     <div class="flex flex-col gap-3">
-                        <h4 class="text-[#111418] text-sm font-bold uppercase tracking-wider">Contact</h4>
+                        <h4 class="text-[#111418] text-sm font-bold uppercase tracking-wider"><?php echo __('contact'); ?></h4>
                         <p class="text-[#617589] text-sm flex items-center gap-2">
                             <span class="material-symbols-outlined text-sm">location_on</span> Kathmandu, Nepal
                         </p>
@@ -406,11 +358,11 @@ session_start();
             const originalText = btn.innerHTML;
             
             // Loading State
-            btn.innerHTML = `<span class="material-symbols-outlined animate-spin">refresh</span> Submitting...`;
+            btn.innerHTML = `<span class="material-symbols-outlined animate-spin">refresh</span> <?php echo __('submitting'); ?>...`;
             btn.classList.add('opacity-75', 'cursor-not-allowed');
             
             setTimeout(() => {
-                alert("Namaste! Your grievance has been submitted successfully. Reference ID: GRV-2024-999");
+                alert("<?php echo __('alert_demo_grievance'); ?>");
                 toggleModal('complaint-modal');
                 btn.innerHTML = originalText;
                 btn.classList.remove('opacity-75', 'cursor-not-allowed');
@@ -423,17 +375,19 @@ session_start();
             const btn = input.nextElementSibling.querySelector('button');
             
             if(!input.value) {
-                alert("Please enter a Complaint ID first.");
+                alert("<?php echo __('alert_enter_id'); ?>");
                 input.focus();
                 return;
             }
 
             const originalText = btn.innerHTML;
-            btn.innerText = "Checking...";
+            btn.innerText = "<?php echo __('checking'); ?>...";
             btn.classList.add('bg-gray-500');
             
             setTimeout(() => {
-                alert(`Status for ${input.value}: PENDING (Processing at District Office)`);
+                let alertMsg = "<?php echo __('alert_demo_track'); ?>";
+                alertMsg = alertMsg.replace("{id}", input.value);
+                alert(alertMsg);
                 btn.innerHTML = originalText;
                 btn.classList.remove('bg-gray-500');
             }, 1000);

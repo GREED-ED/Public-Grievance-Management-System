@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once 'includes/languages.php';
 require_once 'db_connect.php';
 
 // Check if user is logged in and is a citizen
@@ -18,11 +18,11 @@ $stmt->execute([$user_id]);
 $grievances = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
-<html class="light" lang="en">
+<html class="light" lang="<?php echo $_SESSION['lang']; ?>">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>User Dashboard - Public Grievance Management System</title>
+    <title><?php echo __('user_dashboard'); ?> - <?php echo __('system_name'); ?></title>
     <link href="https://fonts.googleapis.com" rel="preconnect"/>
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
@@ -50,48 +50,19 @@ $grievances = $stmt->fetchAll();
 </head>
 <body class="bg-background-light text-[#111418] min-h-screen flex flex-col">
 
-<header class="bg-white border-b border-[#f0f2f4] sticky top-0 z-30">
-    <div class="px-4 md:px-10 py-3 flex items-center justify-between max-w-[1200px] mx-auto w-full">
-        <a href="index.php" class="flex items-center gap-4 cursor-pointer">
-            <div class="size-10 flex items-center justify-center rounded-lg bg-primary/10 text-primary">
-                <span class="material-symbols-outlined">account_balance</span>
-            </div>
-            <div>
-                <h2 class="text-[#111418] text-lg font-bold leading-tight">Nepal Government</h2>
-                <p class="text-xs text-[#617589] font-medium">Public Grievance Management System</p>
-            </div>
-        </a>
-        <div class="hidden lg:flex flex-1 justify-end gap-8 items-center">
-            <div class="flex items-center gap-6">
-                <a class="text-[#111418] text-sm font-medium hover:text-primary transition-colors" href="index.php">Home</a>
-                <a class="text-[#111418] text-sm font-medium hover:text-primary transition-colors" href="about.php">About</a>
-                <a class="text-[#111418] text-sm font-medium hover:text-primary transition-colors" href="departments.php">Departments</a>
-                <a class="text-[#111418] text-sm font-medium hover:text-primary transition-colors" href="contact.php">Contact</a>
-            </div>
-            <div class="flex gap-2">
-                <span class="hidden md:flex items-center text-sm font-bold text-gray-700 mr-2">Namaste, <?php echo htmlspecialchars($_SESSION['user_name']); ?></span>
-                <button class="flex items-center justify-center rounded-lg h-9 px-4 bg-secondary text-white text-sm font-bold hover:bg-blue-800 transition-colors shadow-sm gap-2" onclick="window.location.href='user-dashboard.php'">
-                    <span class="material-symbols-outlined text-lg">dashboard</span> Dashboard
-                </button>
-                <button class="flex items-center justify-center rounded-lg h-9 px-4 bg-red-50 text-red-600 text-sm font-bold hover:bg-red-100 transition-colors border border-red-100" onclick="window.location.href='logout.php'">
-                    Logout
-                </button>
-            </div>
-        </div>
-    </div>
-</header>
+<?php include 'includes/navbar.php'; ?>
 
 <main class="flex-grow py-8 px-4 sm:px-6">
     <div class="max-w-7xl mx-auto space-y-8">
         
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-                <h2 class="text-3xl font-black text-[#111418]">My Grievances</h2>
-                <p class="text-gray-500 mt-1">Track the status of your submitted complaints (तपाइँको गुनासोहरु)</p>
+                <h2 class="text-3xl font-black text-[#111418]"><?php echo __('my_grievances'); ?></h2>
+                <p class="text-gray-500 mt-1"><?php echo __('track_status_desc'); ?></p>
             </div>
-            <a href="form.php" class="bg-primary text-white font-bold py-3 px-6 rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2 shadow-lg hover:shadow-xl">
+            <a href="form.php?lang=<?php echo $_SESSION['lang']; ?>" class="bg-primary text-white font-bold py-3 px-6 rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2 shadow-lg hover:shadow-xl">
                 <span class="material-symbols-outlined">add</span>
-                New Grievance
+                <?php echo __('new_grievance'); ?>
             </a>
         </div>
 
@@ -106,7 +77,7 @@ $grievances = $stmt->fetchAll();
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
                 <div>
-                    <p class="text-gray-500 text-sm font-bold uppercase">Total Submitted</p>
+                    <p class="text-gray-500 text-sm font-bold uppercase"><?php echo __('total_submitted'); ?></p>
                     <p class="text-3xl font-black text-[#111418] mt-1"><?php echo count($grievances); ?></p>
                 </div>
                 <div class="size-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
@@ -115,7 +86,7 @@ $grievances = $stmt->fetchAll();
             </div>
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
                 <div>
-                    <p class="text-gray-500 text-sm font-bold uppercase">Pending</p>
+                    <p class="text-gray-500 text-sm font-bold uppercase"><?php echo __('pending'); ?></p>
                     <p class="text-3xl font-black text-orange-600 mt-1">
                         <?php echo count(array_filter($grievances, fn($g) => $g['status'] == 'Pending')); ?>
                     </p>
@@ -126,7 +97,7 @@ $grievances = $stmt->fetchAll();
             </div>
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
                 <div>
-                    <p class="text-gray-500 text-sm font-bold uppercase">Resolved</p>
+                    <p class="text-gray-500 text-sm font-bold uppercase"><?php echo __('resolved'); ?></p>
                     <p class="text-3xl font-black text-green-600 mt-1">
                         <?php echo count(array_filter($grievances, fn($g) => $g['status'] == 'Resolved')); ?>
                     </p>
@@ -143,11 +114,11 @@ $grievances = $stmt->fetchAll();
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-gray-50 border-b border-gray-200 text-xs uppercase text-gray-500 font-bold tracking-wider">
-                            <th class="px-6 py-4">Ref ID</th>
-                            <th class="px-6 py-4">Category</th>
-                            <th class="px-6 py-4">Submission Date</th>
-                            <th class="px-6 py-4">Status</th>
-                            <th class="px-6 py-4">Action</th>
+                            <th class="px-6 py-4"><?php echo __('ref_id'); ?></th>
+                            <th class="px-6 py-4"><?php echo __('category_label'); ?></th>
+                            <th class="px-6 py-4"><?php echo __('submission_date'); ?></th>
+                            <th class="px-6 py-4"><?php echo __('status'); ?></th>
+                            <th class="px-6 py-4"><?php echo __('action'); ?></th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
@@ -165,6 +136,13 @@ $grievances = $stmt->fetchAll();
                                     </td>
                                     <td class="px-6 py-4">
                                         <?php 
+                                            $statusKey = match($row['status']) {
+                                                'Pending' => 'status_pending',
+                                                'In Progress' => 'status_in_progress',
+                                                'Resolved' => 'status_resolved',
+                                                'Rejected' => 'status_rejected',
+                                                default => 'status_pending'
+                                            };
                                             $statusColor = match($row['status']) {
                                                 'Pending' => 'bg-orange-100 text-orange-800',
                                                 'In Progress' => 'bg-blue-100 text-blue-800',
@@ -174,16 +152,16 @@ $grievances = $stmt->fetchAll();
                                             };
                                         ?>
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold <?php echo $statusColor; ?>">
-                                            <?php echo htmlspecialchars($row['status']); ?>
+                                            <?php echo __( $statusKey ); ?>
                                         </span>
                                     </td>
                                     <td class="px-6 py-4">
                                         <?php if($row['attachment']): ?>
                                             <a href="uploads/<?php echo htmlspecialchars($row['attachment']); ?>" target="_blank" class="text-secondary hover:text-blue-800 text-sm font-bold flex items-center gap-1">
-                                                <span class="material-symbols-outlined text-base">attachment</span> View File
+                                                <span class="material-symbols-outlined text-base">attachment</span> <?php echo __('view_file'); ?>
                                             </a>
                                         <?php else: ?>
-                                            <span class="text-gray-400 text-xs italic">No Attachment</span>
+                                            <span class="text-gray-400 text-xs italic"><?php echo __('no_attachment'); ?></span>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
@@ -193,7 +171,7 @@ $grievances = $stmt->fetchAll();
                                 <td colspan="5" class="px-6 py-12 text-center text-gray-500">
                                     <div class="flex flex-col items-center gap-2">
                                         <span class="material-symbols-outlined text-4xl text-gray-300">inbox</span>
-                                        <p>No grievances submitted yet.</p>
+                                        <p><?php echo __('no_grievances_found'); ?></p>
                                     </div>
                                 </td>
                             </tr>
@@ -205,6 +183,21 @@ $grievances = $stmt->fetchAll();
 
     </div>
 </main>
+
+<footer class="bg-white border-t border-[#dbe0e6] py-10">
+    <div class="max-w-[1200px] mx-auto px-4 md:px-10 flex flex-col md:flex-row justify-between gap-10">
+        <div class="flex flex-col gap-4 max-w-sm">
+            <div class="flex items-center gap-3">
+                <div class="size-8 flex items-center justify-center rounded bg-primary/10 text-primary">
+                    <span class="material-symbols-outlined">account_balance</span>
+                </div>
+                <span class="text-[#111418] font-bold text-lg"><?php echo __('nepal_government'); ?></span>
+            </div>
+            <p class="text-[#617589] text-sm"><?php echo __('official_portal'); ?></p>
+            <p class="text-[#617589] text-sm">© 2024 <?php echo __('rights_reserved'); ?></p>
+        </div>
+    </div>
+</footer>
 
 </body>
 </html>
